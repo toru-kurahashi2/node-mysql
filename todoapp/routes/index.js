@@ -1,13 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql');
-
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'passowrd',
-  database: 'todo_app'
-});
 
 let todos = [];
 
@@ -19,13 +11,6 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-  connection.connect((err) => {
-    if (err) {
-      console.log('error connecting: ' + err.stack);
-      return
-    }
-    console.log('success');
-  });
   const todo = req.body.add;
   todos.push(todo);
   res.redirect('/');
