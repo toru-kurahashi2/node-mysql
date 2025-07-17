@@ -10,6 +10,8 @@ async function findById(userId) {
   return {...user};
 }
 
+
+
 async function where(condition) {
   return await knex(TABLE_NAME)
     .where(condition)
@@ -17,6 +19,7 @@ async function where(condition) {
       if (results.length === 0) {
         return null;
       }
+      console.log(results[0]);
       return results[0];
     });
 }
