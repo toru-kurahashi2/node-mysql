@@ -11,9 +11,13 @@
     <input type="submit" value="追加"/>
   </form>
   <ul>
+  <% if (Array.isArray(todos) && todos.length > 0) { %>
     <% for(let todo of todos){ %>
       <li><span><%= todo.content %></span></li>
     <% } %>
-  </ul>
+  <% } else { %>
+    <li>タスクはありません</li>
+  <% } %>
+</ul>
   </body>
 </html>
