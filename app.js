@@ -3,8 +3,20 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const cookieSession = require("cookie-session");
+const secret = "secretCuisine123";
 
 const app = express();
+
+app.use(
+  cookieSession({
+    name: "session",
+    keys: [secret],
+
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -17,8 +29,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // router
+
 app.use('/', require('./routes'));
-//router.use('/signup', require('./signup'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
