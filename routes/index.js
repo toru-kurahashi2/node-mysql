@@ -4,7 +4,9 @@ const knex = require('../db/knex');
 
 router.get('/', function (req, res, next) {
   const isAuth = req.isAuthenticated();
+  
   if (isAuth) {
+    const Uname=req.user.name;
     const userId = req.user.id;
     knex("tasks")
       .select("*")
@@ -14,6 +16,7 @@ router.get('/', function (req, res, next) {
           title: 'ToDo App',
           todos: results,
           isAuth: isAuth,
+          userName: Uname,
         });
       })
       .catch(function (err) {
@@ -21,6 +24,7 @@ router.get('/', function (req, res, next) {
         res.render('index', {
           title: 'ToDo App',
           isAuth: isAuth,
+          userName: Uname,
           errorMessage: [err.sqlMessage],
         });
       });
@@ -34,6 +38,7 @@ router.get('/', function (req, res, next) {
 
 router.post('/', function (req, res, next) {
   const isAuth = req.isAuthenticated();
+  const Uname=req.user.name;
   const userId = req.user.id;
   const todo = req.body.add;
   knex("tasks")
@@ -46,6 +51,7 @@ router.post('/', function (req, res, next) {
       res.render('index', {
         title: 'ToDo App',
         isAuth: isAuth,
+        userName: Uname,
         errorMessage: [err.sqlMessage],
       });
     });

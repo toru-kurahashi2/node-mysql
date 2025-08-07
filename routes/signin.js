@@ -4,9 +4,11 @@ const passport = require("passport");
 
 router.get('/', function (req, res, next) {
   const isAuth = req.isAuthenticated();
+  // const Uname=req.user.name;
   res.render("signin", {
     title: "Sign in",
     isAuth: isAuth,
+    // userName: Uname,
   });
 });
 
