@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const knex = require("../db/knex");
 const bcrypt = require("bcrypt");
+const passport = require('passport'); // passportをインポート
 
 router.get('/', function (req, res, next) {
   const isAuth = req.isAuthenticated();
@@ -31,8 +32,17 @@ router.post('/', function (req, res, next) {
         const hashedPassword = await bcrypt.hash(password, 10);
         knex("users")
           .insert({name: username, password: hashedPassword})
-          .then(function () {
-            res.redirect("/");
+          .then(function (result) {
+            // 新しく作成されたユーザーのIDを取得
+            const newUserId = result[0];
+            // ユーザー情報をデータベースから取得
+            knex("users").where('id', newUserId).first().then(user => {
+              // req.login()を使用してセッションにユーザー情報を保存
+              req.login(user, function(err) {
+                if (err) { return next(err); }
+                return res.redirect('/');
+              });
+            });
           })
           .catch(function (err) {
             console.error(err);

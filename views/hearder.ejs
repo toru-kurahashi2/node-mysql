@@ -1,3 +1,10 @@
+<style>
+    .uname {
+      padding-top: .5rem;
+       padding-right: .5rem; 
+       padding-left: .5rem;
+    }
+</style>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="/">TodoApp</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
@@ -11,7 +18,7 @@
         <a class="nav-link" href="/logout">Logout</a>
       </li>
       <li class="nav-item">
-        <div class="nav-link">user: <%= userName %></div>
+        <div class="uname">user: <%= userName %></div>
       </li>
       <% }else{ %>
       <li class="nav-item">

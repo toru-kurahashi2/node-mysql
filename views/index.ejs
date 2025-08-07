@@ -6,34 +6,39 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 </head>
 <body>
-  <%- include('./hearder.ejs'); %>
-  <%- include('./error_messages'); %>
+ <%- include('./hearder.ejs') %>
+<style>
+    .task-done {
+        text-decoration: line-through;
+        color: #888;
+    }
+</style>
 <% if(isAuth) { %>
-  <div class="container">
-    <div class="row">
-       <div class="col-md-6">
-  <form action="/" method="post">
-    <label>タスクの追加</label>
-    <input required type="text" name="add" placeholder="何をする?"/>
-    <input type="submit" value="追加"/>
-  </form>
-  </div>
-  <div class="col-md-6">
-  <ul>
-    <% for(let todo of todos){ %>
-      <li><span><%= todo.content %></span></li>
-    <% } %>
-  </ul>
-  </div>
-  </div>
-  </div>
+<main class="container py-5">
+    <h1>ToDoリスト</h1>
+    <%- include('./error_messages.ejs', { errorMessage: errorMessage }) %>
+    <form class="my-4" action="/" method="post">
+        <div class="form-group">
+            <input type="text" class="form-control" name="content" placeholder="新しいタスクを入力してください">
+        </div>
+        <button type="submit" class="btn btn-primary">タスクを追加</button>
+    </form>
+    <ul class="list-group">
+        <% tasks.forEach(task => { %>
+        <li class="list-group-item d-flex align-items-center">
+            <form action="/complete" method="post" class="d-inline mr-3">
+                <input type="hidden" name="task_id" value="<%= task.id %>">
+                <input type="checkbox" onchange="this.form.submit()" <%= task.is_done ? 'checked' : '' %>>
+            </form>
+            <span class="<%= task.is_done ? 'task-done' : '' %>"><%= task.content %></span>
+        </li>
+        <% }) %>
+    </ul>
+</main>
 <% } else { %>
   <h1>Welcome to the TodoApp</h1>
   <a class="btn btn-primary" href="/signup" role="button">Sign up now!</a>
   <!-- <a href="/signup">Sign up now!</a> -->
 <% } %>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 </body>
 </html>
