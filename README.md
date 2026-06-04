@@ -1,2 +1,2 @@
-# node-mysql-websystem
+# node-mysql
 Node.js &amp; MySQL
