@@ -11,6 +11,7 @@ const connection = mysql.createConnection({
   database: 'todo_app'
 });
 
+
 router.get('/', function (req, res, next) {
   res.render('index', {
     title: 'ToDo App',
@@ -27,7 +28,13 @@ router.post('/', function (req, res, next) {
     console.log('success');
   });
   const todo = req.body.add;
-  res.redirect('/');
+  connection.query(
+    `insert into tasks (user_id, content) values (1, '${todo}');`,
+    (error, results) => {
+      console.log(error);
+      res.redirect('/');
+    }
+  );
 });
 
 module.exports = router;
