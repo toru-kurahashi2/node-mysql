@@ -1,19 +1,34 @@
 const express = require('express');
 const router = express.Router();
+const mysql = require('mysql');
 
-let todos = [];
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '[あなたのパスワード]',
+  database: 'todo_app'
+});
+
+// ファイルの冒頭にあった「let todos = [];」は不要なので削除したままでOKです
 
 router.get('/', function (req, res, next) {
-  res.render('index', {
-    title: 'ToDo App',
-    todos: todos,
+  // ここで初めて todos を定義して使う
+  connection.query('SELECT * FROM tasks', (error, results) => {
+    res.render('index', {
+      title: 'ToDo App',
+      todos: results || [], // ここでresultsをtodosとして渡す
+    });
   });
 });
 
 router.post('/', function (req, res, next) {
   const todo = req.body.add;
-  todos.push(todo);
-  res.redirect('/');
+  connection.query(
+    `insert into tasks (user_id, content) values (1, '${todo}');`,
+    (error, results) => {
+      res.redirect('/');
+    }
+  );
 });
 
 module.exports = router;
