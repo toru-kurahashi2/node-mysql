@@ -1,54 +1,50 @@
 const express = require('express');
 const router = express.Router();
-const knex = require('../db/knex');
 const mysql = require('mysql');
 
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'password',
+  password: '[事前準備で設定したrootユーザのパスワード]',
   database: 'todo_app'
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.error('MySQL connection error:', err.stack || err);
-    return;
-  }
-  console.log('MySQL connected as id', connection.threadId);
-});
-
 router.get('/', function (req, res, next) {
-  knex("tasks")
-    .select("*")
-    .then(function (results) {
-      console.log(results);
+  connection.query(
+    `select * from tasks;`,
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        return res.render('index', {
+          title: 'ToDo App',
+          todos: [],
+        });
+      }
+
       res.render('index', {
         title: 'ToDo App',
-        todos: results,
+        todos: Array.isArray(results) ? results : [],
       });
-    })
-    .catch(function (err) {
-      console.error(err);
-      res.render('index', {
-        title: 'ToDo App',
-      });
-    });
+    }
+  );
 });
 
 router.post('/', function (req, res, next) {
+  connection.connect((err) => {
+    if (err) {
+      console.log('error connecting: ' + err.stack);
+      return
+    }
+    console.log('success');
+  });
   const todo = req.body.add;
-  knex("tasks")
-    .insert({user_id: 1, content: todo})
-    .then(function () {
-      res.redirect('/')
-    })
-    .catch(function (err) {
-      console.error(err);
-      res.render('index', {
-        title: 'ToDo App',
-      });
-    });
+  connection.query(
+    `insert into tasks (user_id, content) values (1, '${todo}');`,
+    (error, results) => {
+      console.log(error);
+      res.redirect('/');
+    }
+  );
 });
 
 module.exports = router;
