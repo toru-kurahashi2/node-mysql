@@ -1,45 +1,92 @@
 const express = require('express');
 const router = express.Router();
 const knex = require('../db/knex');
-const mysql = require('mysql');
+
+async function getTaskColumns() {
+  const hasUserId = await knex.schema.hasColumn('tasks', 'user_id');
+  const hasContent = await knex.schema.hasColumn('tasks', 'content');
+  const hasTitle = await knex.schema.hasColumn('tasks', 'title');
+  const hasStatus = await knex.schema.hasColumn('tasks', 'status');
+
+  return { hasUserId, hasContent, hasTitle, hasStatus };
+}
 
 router.get('/', function (req, res, next) {
   const isAuth = req.isAuthenticated();
-  knex("tasks")
-    .select("*")
-    .then(function (results) {
-      res.render('index', {
-        title: 'ToDo App',
-        todos: results,
-        isAuth: isAuth,
+  if (isAuth) {
+    const userId = req.user.id;
+    getTaskColumns()
+      .then(async function (columns) {
+        let query = knex('tasks').select('*');
+        if (columns.hasUserId) {
+          query = query.where({ user_id: userId });
+        }
+
+        const results = await query;
+        const todos = results.map((todo) => ({
+          ...todo,
+          title: todo.title || todo.content || '',
+        }));
+
+        res.render('index', {
+          title: 'ToDo App',
+          todos: todos,
+          isAuth: isAuth,
+        });
+      })
+      .catch(function (err) {
+        console.error(err);
+        res.render('index', {
+          title: 'ToDo App',
+          isAuth: isAuth,
+          errorMessage: [err.sqlMessage],
+        });
       });
-    })
-    .catch(function (err) {
-      console.error(err);
-      res.render('index', {
-        title: 'ToDo App',
-        isAuth: isAuth,
-        errorMessage: [err.sqlMessage],
-      });
+  } else {
+    res.render('index', {
+      title: 'ToDo App',
+      isAuth: isAuth,
     });
+  }
 });
 
-router.post('/', function (req, res, next) {
+router.post('/', async function (req, res, next) {
   const isAuth = req.isAuthenticated();
+  if (!isAuth) {
+    return res.redirect('/signin');
+  }
+
+  const userId = req.user.id;
   const todo = req.body.add;
-  knex("tasks")
-    .insert({title: todo})
-    .then(function () {
-      res.redirect('/')
-    })
-    .catch(function (err) {
-      console.error(err);
-      res.render('index', {
-        title: 'ToDo App',
-        isAuth: isAuth,
-        errorMessage: [err.sqlMessage],
-      });
+
+  try {
+    const columns = await getTaskColumns();
+    const taskData = {};
+
+    if (columns.hasUserId) {
+      taskData.user_id = userId;
+    }
+    if (columns.hasContent) {
+      taskData.content = todo;
+    } else if (columns.hasTitle) {
+      taskData.title = todo;
+    } else {
+      taskData.title = todo;
+    }
+    if (columns.hasStatus) {
+      taskData.status = 'incomplete';
+    }
+
+    await knex('tasks').insert(taskData);
+    return res.redirect('/');
+  } catch (err) {
+    console.error(err);
+    return res.render('index', {
+      title: 'ToDo App',
+      isAuth: isAuth,
+      errorMessage: [err.sqlMessage],
     });
+  }
 });
 
 router.use('/signup', require('./signup'));
