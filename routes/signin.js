@@ -11,11 +11,24 @@ router.get('/', function (req, res, next) {
   });
 });
 
-router.post('/', passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/signin',
-    failureFlash: true,
-  }
-));
+router.post('/', function (req, res, next) {
+  passport.authenticate('local', function (err, user) {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.redirect('/signin');
+    }
+
+    req.login(user, function (err) {
+      if (err) {
+        return next(err);
+      }
+
+      req.session.userid = user.id;
+      return res.redirect('/');
+    });
+  })(req, res, next);
+});
 
 module.exports = router;
