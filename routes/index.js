@@ -1,16 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql');
+
 const knex = require('../db/knex');
 
 
 
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'password',
-  database: 'todo_app'
-});
+
 
 router.get('/', function (req, res, next) {
   knex("tasks")
@@ -31,7 +26,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
- 
+  
   const todo = req.body.add;
   knex("tasks")
     .insert({user_id: 1, content: todo})
@@ -45,5 +40,7 @@ router.post('/', function (req, res, next) {
       });
     });
 });
+
+router.use('/signup', require('./signup'));
 
 module.exports = router;
