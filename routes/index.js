@@ -89,6 +89,31 @@ router.post('/', async function (req, res, next) {
   }
 });
 
+router.delete('/delete/:id', async function (req, res, next) {
+  const isAuth = req.isAuthenticated();
+  if (!isAuth) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const userId = req.user.id;
+  const taskId = req.params.id;
+
+  try {
+    const columns = await getTaskColumns();
+    let query = knex('tasks').where({ id: taskId });
+
+    if (columns.hasUserId) {
+      query = query.andWhere({ user_id: userId });
+    }
+
+    await query.del();
+    return res.status(200).json({ message: 'Success' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 router.use('/signup', require('./signup'));
 router.use('/signin', require('./signin'));
 router.use('/logout', require('./logout'));

@@ -2,118 +2,139 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
-          },
-          colors: {
-            apple: {
-              bg: '#F5F5F7',
-              card: '#FFFFFF',
-              blue: '#0071E3',
-              blueHover: '#0077ED',
-              text: '#1D1D1F',
-              subtext: '#86868B',
-              border: '#D2D2D7'
-            }
-          },
-          animation: {
-            'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-          },
-          keyframes: {
-            fadeInUp: {
-              '0%': { opacity: '0', transform: 'translateY(20px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            }
-          }
-        }
-      }
-    }
-  </script>
   <style>
     body {
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      background-color: #f5f5f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    input:focus {
-      outline: none;
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
     }
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .task-item {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .task-deleting {
+      opacity: 0;
+      transform: translateX(-20px) scale(0.95);
+    }
+    .task-deleting .task-text {
+      text-decoration: line-through;
+      color: #9ca3af;
+    }
+    .delete-btn {
+      transition: all 0.2s ease;
+    }
+    .delete-btn:hover {
+      background-color: #fee2e2;
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+    .delete-btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ef4444'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M6 18L18 6M6 6l12 12'/%3E%3C/svg%3E");
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .delete-btn:hover::after {
+      opacity: 1;
     }
   </style>
 </head>
-<body class="bg-apple-bg text-apple-text font-sans min-h-screen flex flex-col">
-
+<body class="text-gray-800 min-h-screen flex flex-col">
   <%- include('./header'); %>
   <%- include('./error_messages'); %>
 
-  <main class="flex-grow container mx-auto px-4 py-12 max-w-5xl">
+  <main class="flex-grow container mx-auto px-4 py-12 max-w-2xl">
     <% if(isAuth) { %>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        
-        <div class="animate-fade-in-up" style="animation-delay: 0.1s; opacity: 0;">
-          <div class="glass-effect rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white p-8">
-            <h2 class="text-2xl font-semibold mb-6 tracking-tight">タスクを追加</h2>
-            <form action="/" method="post" class="flex flex-col space-y-5">
-              <input 
-                required 
-                type="text" 
-                name="add" 
-                placeholder="何をする?"
-                class="w-full px-5 py-4 text-lg bg-gray-50/50 rounded-2xl border border-apple-border/50 focus:border-apple-blue focus:bg-white focus:ring-4 focus:ring-apple-blue/20 transition-all duration-300"
-              />
-              <button 
-                type="submit" 
-                class="w-full bg-apple-blue text-white text-lg font-medium py-4 px-6 rounded-2xl hover:bg-apple-blueHover hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-sm"
-              >
-                追加する
+      <div class="glass-card rounded-3xl p-8 animate-fade-in-up">
+        <form action="/" method="post" class="mb-10 relative">
+          <input required type="text" name="add" placeholder="何をする？" 
+                 class="w-full bg-white bg-opacity-60 border border-gray-200 rounded-2xl py-4 px-6 text-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all shadow-sm placeholder-gray-400">
+          <button type="submit" 
+                  class="absolute right-2 top-2 bottom-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl px-6 transition-colors shadow-sm">
+            追加
+          </button>
+        </form>
+
+        <ul class="space-y-3">
+          <% for(let todo of todos){ %>
+            <li class="task-item bg-white bg-opacity-60 border border-gray-100 rounded-2xl p-4 flex items-center shadow-sm" data-id="<%= todo.id %>">
+              <button onclick="deleteTask('<%= todo.id %>', this)" 
+                      class="delete-btn relative w-7 h-7 rounded-full border-2 border-gray-300 mr-4 flex-shrink-0 cursor-pointer focus:outline-none">
               </button>
-            </form>
-          </div>
-        </div>
-
-        <div class="animate-fade-in-up" style="animation-delay: 0.2s; opacity: 0;">
-          <div class="glass-effect rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white overflow-hidden">
-            <h2 class="text-2xl font-semibold p-8 pb-4 tracking-tight">タスク一覧</h2>
-            <% if (todos && todos.length > 0) { %>
-              <ul class="px-8 pb-6">
-                <% for(let todo of todos){ %>
-                  <li class="py-4 border-b border-apple-border/30 last:border-0 flex items-center group transition-colors duration-200 hover:bg-black/[0.02] -mx-4 px-4 rounded-xl">
-                    <div class="w-6 h-6 rounded-full border-2 border-apple-border group-hover:border-apple-blue/50 mr-4 transition-colors duration-200 flex-shrink-0"></div>
-                    <span class="text-xl text-apple-text tracking-tight"><%= todo.title %></span>
-                  </li>
-                <% } %>
-              </ul>
-            <% } else { %>
-              <div class="p-12 text-apple-subtext text-center text-lg">
-                タスクがありません
-              </div>
-            <% } %>
-          </div>
-        </div>
-
+              <span class="task-text text-lg text-gray-700 w-full truncate"><%= todo.title %></span>
+            </li>
+          <% } %>
+        </ul>
       </div>
     <% } else { %>
-      <div class="flex flex-col items-center justify-center min-h-[60vh] text-center animate-fade-in-up">
-        <h1 class="text-6xl font-bold mb-6 tracking-tight">Todo</h1>
-        <p class="text-apple-subtext mb-10 text-2xl">美しく、シンプルなタスク管理。</p>
-        <a 
-          href="/signup" 
-          class="inline-block bg-apple-blue text-white font-medium text-lg py-4 px-10 rounded-full hover:bg-apple-blueHover hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 shadow-md"
-        >
-          始める
+      <div class="glass-card rounded-3xl p-12 text-center animate-fade-in-up mt-10">
+        <h1 class="text-4xl font-bold mb-6 text-gray-900 tracking-tight">Welcome to TodoApp</h1>
+        <p class="text-gray-500 mb-10 text-lg">タスクをシンプルに管理</p>
+        <a href="/signup" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium text-lg rounded-2xl py-3 px-10 transition-colors shadow-md">
+          Sign up now!
         </a>
       </div>
     <% } %>
   </main>
+
+  <script>
+    async function deleteTask(id, buttonElement) {
+      // IDが正しく取得できているかチェック
+      console.log("削除しようとしているID:", id);
+      
+      const listItem = buttonElement.closest('li');
+      listItem.classList.add('task-deleting');
+
+      try {
+        const response = await fetch(`/delete/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          setTimeout(() => {
+            listItem.remove();
+          }, 400); 
+        } else {
+          listItem.classList.remove('task-deleting');
+          
+          // サーバーからどんなエラーが返ってきたかを確認
+          const text = await response.text();
+          alert(`エラー: ${response.status} (${response.statusText})\n詳細: ${text}`);
+        }
+      } catch (error) {
+        listItem.classList.remove('task-deleting');
+        alert(`通信エラー: ${error.message}`);
+      }
+    }
+  </script>
 </body>
 </html>
