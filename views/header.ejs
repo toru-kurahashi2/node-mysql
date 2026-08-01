@@ -1,20 +1,26 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="/">TodoApp</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
-          aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <% if(isAuth){ %>
-        <li class="nav-item">
-          <a class="nav-link" href="/logout">Logout</a>
-        </li>
-      <% }else{ %>
-        <li class="nav-item">
-          <a class="nav-link" href="/signin">Sign in</a>
-        </li>
-      <% } %>
-    </ul>
+<nav class="fixed top-0 inset-x-0 z-50 bg-[#1D1D1F]/80 backdrop-blur-md border-b border-[#333336]/40 transition-colors duration-300">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-[44px] flex items-center justify-between">
+    <a href="/" class="flex-shrink-0 text-white/90 hover:text-white transition-colors duration-200 text-lg font-semibold tracking-wide">
+        Todo
+    </a>
+
+    <div class="hidden sm:flex flex-grow justify-end space-x-8 text-[12px] tracking-wide font-medium">
+       <% if(isAuth){ %>
+         <a href="/logout" class="text-white/80 hover:text-white transition-colors duration-200">Logout</a>
+       <% } else { %>
+         <a href="/signin" class="text-white/80 hover:text-white transition-colors duration-200">Sign in</a>
+       <% } %>
+    </div>
+    
+    <div class="sm:hidden flex items-center">
+        <button type="button" class="text-white/80 hover:text-white p-2">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </div>
+
   </div>
 </nav>
+<!-- Add padding to body or main element in layout to account for fixed nav -->
+<div class="pt-[44px]"></div>
