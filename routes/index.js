@@ -17,6 +17,7 @@ router.get('/', function (req, res, next) {
       res.render('index', {
         title: 'ToDo App',
         todos: results,
+        isAuth:isAuth,
       });
     })
     .catch(function (err) {
@@ -29,9 +30,11 @@ router.get('/', function (req, res, next) {
 
 router.post('/', function (req, res, next) {
 
+  const userId = req.session.userid;
+  const isAuth = Boolean(userId);
   const todo = req.body.add;
   knex("tasks")
-    .insert({user_id: 1, content: todo})
+    .insert({user_id: userId, content: todo})
     .then(function () {
       res.redirect('/')
     })
