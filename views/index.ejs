@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title><%= title %></title>
+
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="/stylesheets/style.css"/>
+</head>
+
+<body>
+
+<%- include('./header'); %>
+
+<%- include('./error_messages'); %>
+
+<% if(isAuth) { %>
+
+<div class="container">
+
+  <div class="row">
+
+    <div class="col-md-6">
+      <form action="/" method="post">
+        <label>タスクの追加</label>
+        <input required type="text" name="add" placeholder="何をする?"/>
+        <input class="btn btn-primary" type="submit" value="追加"/>
+      </form>
+    </div>
+
+    <div class="col-md-6">
+      <ul>
+
+        <% for(let todo of todos){ %>
+
+          <li style="display: flex; justify-content: space-between; align-items: center; width: 400px;">
+
+            <span>
+              <%= todo.content %>
+            </span>
+
+            <form action="/delete" method="post">
+              <input type="hidden" name="id" value="<%= todo.id %>"/>
+              <input class="btn btn-danger btn-sm" type="submit" value="削除"/>
+            </form>
+
+          </li>
+
+        <% } %>
+
+      </ul>
+    </div>
+
+  </div>
+
+</div>
+
+<% } else { %>
+
+<div class="container">
+
+  <div class="row">
+
+    <div class="col-md-12">
+
+      <h1>Welcome to TodoApp</h1>
+
+      <%
+        const messages = [
+          "やあ",
+          "はろー",
+          "こんにちは",
+          "今日はサボろう！",
+          "今すぐ寝よう！"
+        ];
+
+        const randomMessage =
+          messages[Math.floor(Math.random() * messages.length)];
+      %>
+
+      <p><%= randomMessage %></p>
+
+      <a class="btn btn-primary" href="/signup" role="button">
+        Sign up now!
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+
+<% } %>
+
+</body>
+</html>
