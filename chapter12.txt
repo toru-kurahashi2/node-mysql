@@ -1,0 +1,44 @@
+@jj2338 ➜ /workspaces/node-mysql-websystem (chapter12) $ mysql -uroot -p
+Enter password:
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 10
+Server version: 8.0.46-0ubuntu0.24.04.3 (Ubuntu)
+
+Copyright (c) 2000, 2026, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create database todo_app;
+Query OK, 1 row affected (0.04 sec)
+
+mysql> create table todo_app.users (id int unsigned auto_increment not null, name varchar(255) unique, password varchar(255), PRIMARY KEY (id));
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> use todo_app;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++--------------------+
+| Tables_in_todo_app |
++--------------------+
+| users              |
++--------------------+
+1 row in set (0.01 sec)
+
+mysql> create table todo_app.tasks (id int unsigned auto_increment not null, user_id int not null, content varchar(255) not null, PRIMARY KEY (id));
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> show tables;
++--------------------+
+| Tables_in_todo_app |
++--------------------+
+| tasks              |
+| users              |
++--------------------+
+2 rows in set (0.00 sec)
