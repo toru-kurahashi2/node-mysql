@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title><%= title %></title>
+
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="/stylesheets/style.css"/>
+
+  <style>
+    .calendar {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .calendar th {
+      text-align: center;
+      padding: 8px;
+      background-color: #f0f0f0;
+    }
+
+    .calendar td {
+      height: 90px;
+      vertical-align: top;
+      border: 1px solid #ddd;
+      padding: 5px;
+    }
+
+    .calendar-date {
+      font-weight: bold;
+    }
+
+    .calendar-todo {
+      font-size: 12px;
+      margin-top: 5px;
+      padding: 3px;
+      background-color: #e9f5ff;
+      border-radius: 4px;
+    }
+
+    .completed-todo {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .calendar-navigation {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .calendar-navigation select {
+      padding: 5px;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<%- include('./header'); %>
+
+<%- include('./error_messages'); %>
+
+<% if(isAuth) { %>
+
+<div class="container">
+
+  <div class="row">
+
+    <!-- Todo一覧 -->
+    <div class="col-md-6">
+
+      <form action="/" method="post">
+
+        <label>タスクの追加</label>
+
+        <input
+          required
+          type="text"
+          name="add"
+          placeholder="何をする?"
+        />
+
+        <!-- 期限 -->
+        <input
+          type="date"
+          name="deadline"
+        />
+
+        <input
+          class="btn btn-primary"
+          type="submit"
+          value="追加"
+        />
+
+      </form>
+
+
+      <ul class="mt-4">
+
+        <% for(let todo of todos){ %>
+
+          <li style="display: flex; justify-content: space-between; align-items: center; width: 400px;">
+
+            <% if(todo.completed) { %>
+
+              <span class="completed-todo">
+
+                <%= todo.content %>
+
+                <% if(todo.deadline) { %>
+
+                  <small>
+                    （期限：<%= todo.deadline.toISOString().slice(0, 10) %>）
+                  </small>
+
+                <% } %>
+
+              </span>
+
+            <% } else { %>
+
+              <span>
+
+                <%= todo.content %>
+
+                <% if(todo.deadline) { %>
+
+                  <small>
+                    （期限：<%= todo.deadline.toISOString().slice(0, 10) %>）
+                  </small>
+
+                <% } %>
+
+              </span>
+
+            <% } %>
+
+
+            <div>
+
+              <% if(!todo.completed) { %>
+
+                <form
+                  action="/complete"
+                  method="post"
+                  style="display: inline;"
+                >
+
+                  <input
+                    type="hidden"
+                    name="id"
+                    value="<%= todo.id %>"
+                  />
+
+                  <input
+                    class="btn btn-success btn-sm"
+                    type="submit"
+                    value="完了"
+                  />
+
+                </form>
+
+              <% } %>
+
+
+              <form
+                action="/delete"
+                method="post"
+                style="display: inline;"
+              >
+
+                <input
+                  type="hidden"
+                  name="id"
+                  value="<%= todo.id %>"
+                />
+
+                <input
+                  class="btn btn-danger btn-sm"
+                  type="submit"
+                  value="削除"
+                />
+
+              </form>
+
+            </div>
+
+          </li>
+
+        <% } %>
+
+      </ul>
+
+    </div>
+
+
+    <!-- カレンダー -->
+    <div class="col-md-6">
+
+      <%
+        const today = new Date();
+
+        let calendarYear = today.getFullYear();
+        let calendarMonth = today.getMonth();
+
+        /*
+         * URLから選択された年月を取得
+         *
+         * 例：
+         * /?month=2027-03
+         */
+
+        if (month) {
+
+          const selectedDate = new Date(month + "-01");
+
+          if (!isNaN(selectedDate.getTime())) {
+
+            calendarYear = selectedDate.getFullYear();
+            calendarMonth = selectedDate.getMonth();
+
+          }
+
+        }
+
+        const firstDay =
+          new Date(calendarYear, calendarMonth, 1).getDay();
+
+        const lastDate =
+          new Date(calendarYear, calendarMonth + 1, 0).getDate();
+      %>
+
+
+      <!-- 年・月選択 -->
+      <div class="calendar-navigation">
+
+        <select id="yearSelect">
+
+          <% for(let y = calendarYear - 5; y <= calendarYear + 5; y++) { %>
+
+            <option
+              value="<%= y %>"
+              <%= y === calendarYear ? 'selected' : '' %>
+            >
+              <%= y %>年
+            </option>
+
+          <% } %>
+
+        </select>
+
+
+        <select id="monthSelect">
+
+          <% for(let i = 0; i < 12; i++) { %>
+
+            <option
+              value="<%= i %>"
+              <%= i === calendarMonth ? 'selected' : '' %>
+            >
+              <%= i + 1 %>月
+            </option>
+
+          <% } %>
+
+        </select>
+
+      </div>
+
+
+      <!-- カレンダー -->
+
+      <table class="calendar">
+
+        <thead>
+
+          <tr>
+            <th>日</th>
+            <th>月</th>
+            <th>火</th>
+            <th>水</th>
+            <th>木</th>
+            <th>金</th>
+            <th>土</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <%
+            let day = 1;
+
+            for(let week = 0; week < 6; week++) {
+          %>
+
+            <tr>
+
+              <% for(let weekday = 0; weekday < 7; weekday++) { %>
+
+                <%
+                  if(week === 0 && weekday < firstDay) {
+                %>
+
+                  <td></td>
+
+                <%
+                  } else if(day > lastDate) {
+                %>
+
+                  <td></td>
+
+                <%
+                  } else {
+                %>
+
+                  <td>
+
+                    <div class="calendar-date">
+                      <%= day %>
+                    </div>
+
+
+                    <%
+                      const currentDate =
+                        calendarYear + "-" +
+                        String(calendarMonth + 1).padStart(2, "0") + "-" +
+                        String(day).padStart(2, "0");
+
+                      for(let todo of todos) {
+
+                        let todoDate = "";
+
+                        if(todo.deadline) {
+
+                          todoDate =
+                            todo.deadline.toISOString().slice(0, 10);
+
+                        }
+
+                        if(todoDate === currentDate) {
+                    %>
+
+                          <div class="calendar-todo <%= todo.completed ? 'completed-todo' : '' %>">
+
+                            <%= todo.content %>
+
+                          </div>
+
+                    <%
+                        }
+                      }
+                    %>
+
+                  </td>
+
+                <%
+                    day++;
+                  }
+                %>
+
+              <% } %>
+
+            </tr>
+
+          <%
+            }
+          %>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- 年・月を変更したらカレンダーを変更 -->
+
+<script>
+
+  const yearSelect = document.getElementById("yearSelect");
+  const monthSelect = document.getElementById("monthSelect");
+
+  function changeCalendar() {
+
+    const year = yearSelect.value;
+
+    const month = String(
+      Number(monthSelect.value) + 1
+    ).padStart(2, "0");
+
+    window.location.href =
+      "/?month=" + year + "-" + month;
+
+  }
+
+  yearSelect.addEventListener("change", changeCalendar);
+
+  monthSelect.addEventListener("change", changeCalendar);
+
+</script>
+
+
+<% } else { %>
+
+
+<!-- ログインしていない場合 -->
+
+<div class="container">
+
+  <div class="row">
+
+    <div class="col-md-12">
+
+      <h1>Welcome to TodoApp</h1>
+
+      <%
+        const messages = [
+          "やあ",
+          "はろー",
+          "こんにちは",
+          "今日はサボろう！",
+          "今すぐ寝よう！"
+        ];
+
+        const randomMessage =
+          messages[Math.floor(Math.random() * messages.length)];
+      %>
+
+      <p><%= randomMessage %></p>
+
+      <a
+        class="btn btn-primary"
+        href="/signup"
+        role="button"
+      >
+        Sign up now!
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+
+<% } %>
+
+</body>
+
+</html>
