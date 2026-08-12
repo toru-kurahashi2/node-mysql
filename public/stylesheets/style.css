@@ -6,3 +6,9 @@ body {
 a {
   color: #00B7FF;
 }
+
+/* Priority colors */
+.priority-high { background: #ffe6e6; color: #990000; padding: 6px; margin-bottom:4px; border-radius:4px; }
+.priority-medium { background: #fff7e6; color: #996600; padding: 6px; margin-bottom:4px; border-radius:4px; }
+.priority-low { background: #e8ffe8; color: #006600; padding: 6px; margin-bottom:4px; border-radius:4px; }
+.priority-high .badge, .priority-medium .badge, .priority-low .badge { margin-left: 8px; }

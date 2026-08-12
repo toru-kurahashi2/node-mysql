@@ -3,6 +3,7 @@
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title><%= title %></title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
   
 </head>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -18,13 +19,33 @@
       <form action="/" method="post">
         <label>タスクの追加</label>
         <input required type="text" name="add" placeholder="何をする?"/>
+        <br>
+        <label>優先度</label>
+        <select name="priority">
+          <option value="high">高</option>
+          <option value="medium" selected>中</option>
+          <option value="low">低</option>
+        </select>
+        <br>
+        <label>カテゴリー</label>
+        <select name="category">
+          <option value="school">学校</option>
+          <option value="work">職場</option>
+          <option value="personal" selected>個人</option>
+          <option value="other">その他</option>
+        </select>
         <input type="submit" value="追加"/>
       </form>
     </div>
     <div class="col-md-6">
       <ul>
         <% for(let todo of todos){ %>
-          <li><span><%= todo.content %></span></li>
+          <% const pri = (todo.priority || todo.prior || 'low'); %>
+          <% const cat = (todo.category || todo.cat || 'other'); %>
+          <li class="priority-<%= pri %>"><span><%= todo.content %></span>
+            <small class="badge badge-pill badge-secondary"> <%= pri === 'high' ? '高' : (pri === 'medium' ? '中' : '低') %></small>
+            <small class="badge badge-info"> <%= cat === 'school' ? '学校' : (cat === 'work' ? '職場' : (cat === 'personal' ? '個人' : 'その他')) %></small>
+          </li>
         <% } %>
       </ul>
     </div>

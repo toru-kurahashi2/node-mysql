@@ -24,6 +24,8 @@ router.get('/', function (req, res, next) {
       console.error(err);
       res.render('index', {
         title: 'ToDo App',
+        todos: [],
+        isAuth: isAuth,
       });
     });
 });
@@ -33,8 +35,18 @@ router.post('/', function (req, res, next) {
   const userId = req.session.userid;
   const isAuth = Boolean(userId);
   const todo = req.body.add;
+  const priority = req.body.priority || 'low';
+  const category = req.body.category || 'other';
+  if (!todo || String(todo).trim() === '') {
+    return res.redirect('/');
+  }
+
+  // normalize priority and category
+  const p = ['high', 'medium', 'low'].includes(priority) ? priority : 'low';
+  const c = ['school', 'work', 'personal', 'other'].includes(category) ? category : 'other';
+
   knex("tasks")
-    .insert({user_id: userId, content: todo})
+    .insert({user_id: userId, content: todo, priority: p, category: c})
     .then(function () {
       res.redirect('/')
     })
@@ -42,6 +54,8 @@ router.post('/', function (req, res, next) {
       console.error(err);
       res.render('index', {
         title: 'ToDo App',
+        todos: [],
+        isAuth: isAuth,
       });
     });
 });
